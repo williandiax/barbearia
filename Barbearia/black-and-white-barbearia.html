@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Black & White Barbearia — Agendamento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0d0d0d;
+    --black-soft:#161616;
+    --white:#faf9f6;
+    --gray-line:#2a2a2a;
+    --gray-mid:#8a8a83;
+    --gray-light:#e6e4dd;
+    --red:#c8102e;
+    --red-dark:#96081f;
+    --radius:2px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  body{
+    background:var(--white);
+    color:var(--black);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3,.display{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+    line-height:0.92;
+  }
+
+  a{color:inherit;text-decoration:none;}
+  ul{list-style:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  input{font-family:inherit;}
+
+  :focus-visible{
+    outline:3px solid var(--red);
+    outline-offset:3px;
+  }
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  /* ---------- Stripe signature divider (barber pole) ---------- */
+  .stripe-divider{
+    height:14px;
+    width:100%;
+    background:repeating-linear-gradient(
+      -45deg,
+      var(--black) 0 18px,
+      var(--white) 18px 36px,
+      var(--red) 36px 54px,
+      var(--white) 54px 72px
+    );
+  }
+  .stripe-divider.thin{height:8px;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:100;
+    background:rgba(13,13,13,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--gray-line);
+  }
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:78px;
+  }
+  .logo{
+    color:var(--white);
+    font-family:'Anton',sans-serif;
+    font-size:22px;
+    letter-spacing:0.03em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .logo .dot{
+    width:9px;height:9px;background:var(--red);
+    display:inline-block;
+    border-radius:50%;
+  }
+  .nav-links{
+    display:flex;
+    gap:40px;
+  }
+  .nav-links a{
+    color:var(--gray-light);
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-weight:600;
+    position:relative;
+    padding-bottom:4px;
+  }
+  .nav-links a::after{
+    content:"";
+    position:absolute;
+    left:0;bottom:0;
+    width:0%;height:2px;
+    background:var(--red);
+    transition:width .25s var(--ease);
+  }
+  .nav-links a:hover::after{width:100%;}
+
+  .nav-staff-link{
+    color:var(--gray-mid);
+    font-size:12px;
+    letter-spacing:0.07em;
+    text-transform:uppercase;
+    font-weight:600;
+    border:1px solid var(--gray-line);
+    padding:9px 16px;
+    border-radius:var(--radius);
+    transition:border-color .2s var(--ease), color .2s var(--ease);
+  }
+  .nav-staff-link:hover{border-color:var(--gray-mid); color:var(--white);}
+  .nav-staff-link.mobile{
+    border:1px solid var(--gray-line);
+    color:var(--gray-mid);
+    text-align:left;
+    padding:12px 16px;
+    width:fit-content;
+  }
+
+  .nav-cta{
+    background:var(--red);
+    color:var(--white);
+    padding:12px 22px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    border-radius:var(--radius);
+    transition:background .2s var(--ease), transform .2s var(--ease);
+  }
+  .nav-cta:hover{background:var(--red-dark); transform:translateY(-1px);}
+
+  .burger{
+    display:none;
+    flex-direction:column;
+    gap:5px;
+    width:26px;
+  }
+  .burger span{height:2px;background:var(--white);display:block;}
+
+  .mobile-menu{
+    display:none;
+    position:fixed;
+    top:78px;left:0;right:0;
+    background:var(--black);
+    border-bottom:1px solid var(--gray-line);
+    flex-direction:column;
+    padding:20px 32px 30px;
+    gap:22px;
+    z-index:99;
+  }
+  .mobile-menu.open{display:flex;}
+  .mobile-menu a{
+    color:var(--white);
+    font-size:15px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    font-weight:600;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:var(--black);
+    color:var(--white);
+    padding:170px 0 90px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .wrap{
+    display:grid;
+    grid-template-columns:1.15fr 0.85fr;
+    gap:50px;
+    align-items:center;
+  }
+  .eyebrow{
+    color:var(--red);
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    margin-bottom:22px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:34px;height:1px;
+    background:var(--red);
+  }
+  .hero h1{
+    font-size:clamp(48px,7vw,92px);
+    color:var(--white);
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--red);
+  }
+  .hero p.lede{
+    margin-top:26px;
+    max-width:460px;
+    color:var(--gray-mid);
+    font-size:17px;
+    line-height:1.6;
+  }
+  .hero-actions{
+    margin-top:38px;
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .btn-primary{
+    background:var(--red);
+    color:var(--white);
+    padding:17px 30px;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    border-radius:var(--radius);
+    transition:background .2s var(--ease), transform .2s var(--ease);
+    display:inline-block;
+  }
+  .btn-primary:hover{background:var(--red-dark); transform:translateY(-2px);}
+  .btn-ghost{
+    border:1px solid rgba(250,249,246,0.3);
+    color:var(--white);
+    padding:17px 30px;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    border-radius:var(--radius);
+    transition:border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .btn-ghost:hover{border-color:var(--white); background:rgba(255,255,255,0.06);}
+
+  .hero-stats{
+    display:flex;
+    gap:36px;
+    margin-top:56px;
+    border-top:1px solid var(--gray-line);
+    padding-top:26px;
+  }
+  .hero-stats div b{
+    font-family:'Anton',sans-serif;
+    font-size:30px;
+    display:block;
+    color:var(--white);
+  }
+  .hero-stats div span{
+    font-size:12px;
+    color:var(--gray-mid);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+
+  /* Hero visual: pole */
+  .hero-visual{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+  }
+  .pole{
+    width:90px;
+    height:420px;
+    border-radius:45px;
+    background:repeating-linear-gradient(
+      -45deg,
+      var(--red) 0 22px,
+      var(--white) 22px 44px,
+      var(--black-soft) 44px 66px,
+      var(--white) 66px 88px
+    );
+    background-size:140% 140%;
+    animation:spin-pole 6s linear infinite;
+    border:6px solid var(--black-soft);
+    box-shadow:0 30px 60px rgba(0,0,0,0.5);
+  }
+  @keyframes spin-pole{
+    0%{background-position:0 0;}
+    100%{background-position:0 200px;}
+  }
+  .pole-cap{
+    position:absolute;
+    width:104px;height:36px;
+    background:#d8d4c8;
+    border-radius:8px;
+    left:50%;
+    transform:translateX(-50%);
+  }
+  .pole-cap.top{top:-8px;}
+  .pole-cap.bottom{bottom:-8px;}
+
+  /* ---------- Section shell ---------- */
+  section{padding:110px 0;}
+  .section-head{
+    max-width:640px;
+    margin-bottom:60px;
+  }
+  .section-head .eyebrow{color:var(--red);}
+  .section-head.dark .eyebrow{color:var(--red);}
+  .section-head h2{
+    font-size:clamp(34px,4.4vw,56px);
+    color:var(--black);
+  }
+  .section-head p{
+    margin-top:18px;
+    color:#4a4a45;
+    font-size:16px;
+    line-height:1.6;
+  }
+  .section-head.on-dark h2, .section-head.on-dark p.lede{color:var(--white);}
+
+  /* ---------- Services ---------- */
+  .services{background:var(--white);}
+  .service-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--gray-line);
+    border:1px solid var(--gray-line);
+  }
+  .service-card{
+    background:var(--white);
+    padding:38px 32px;
+    transition:background .25s var(--ease);
+  }
+  .service-card:hover{background:var(--black); color:var(--white);}
+  .service-card:hover .svc-price{color:var(--red);}
+  .svc-num{
+    font-family:'Anton',sans-serif;
+    font-size:13px;
+    color:var(--gray-mid);
+    letter-spacing:0.1em;
+  }
+  .svc-name{
+    font-family:'Anton',sans-serif;
+    font-size:24px;
+    text-transform:uppercase;
+    margin:18px 0 10px;
+  }
+  .svc-desc{
+    font-size:14px;
+    color:#666;
+    line-height:1.55;
+    margin-bottom:22px;
+  }
+  .service-card:hover .svc-desc{color:#bdbdbd;}
+  .svc-price{
+    font-family:'Anton',sans-serif;
+    font-size:22px;
+    color:var(--red);
+  }
+
+  /* ---------- About / signature ---------- */
+  .about{
+    background:var(--black);
+    color:var(--white);
+  }
+  .about .wrap{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:70px;
+    align-items:center;
+  }
+  .about-visual{
+    aspect-ratio:4/5;
+    background:
+      linear-gradient(160deg, var(--black-soft), var(--black) 60%);
+    border:1px solid var(--gray-line);
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .about-visual svg{width:62%;height:auto;}
+  .about-list{margin-top:30px;}
+  .about-list li{
+    display:flex;
+    gap:16px;
+    padding:20px 0;
+    border-top:1px solid var(--gray-line);
+    align-items:flex-start;
+  }
+  .about-list li:last-child{border-bottom:1px solid var(--gray-line);}
+  .about-list .mark{
+    color:var(--red);
+    font-family:'Anton',sans-serif;
+    font-size:18px;
+    flex-shrink:0;
+  }
+  .about-list h4{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    margin-bottom:6px;
+  }
+  .about-list p{
+    color:var(--gray-mid);
+    font-size:14px;
+    line-height:1.55;
+  }
+
+  /* ---------- Team ---------- */
+  .team{background:var(--white);}
+  .team-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:26px;
+    max-width:760px;
+  }
+  .team-card{
+    text-align:left;
+  }
+  .team-photo{
+    aspect-ratio:3/4;
+    background:var(--black);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--white);
+    font-family:'Anton',sans-serif;
+    font-size:44px;
+    margin-bottom:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .team-photo::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, transparent 55%, var(--red) 150%);
+    opacity:0.35;
+  }
+  .team-card h4{
+    font-family:'Anton',sans-serif;
+    font-size:18px;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+  }
+  .team-card span{
+    display:block;
+    font-size:13px;
+    color:var(--gray-mid);
+    margin-top:4px;
+  }
+
+  /* ---------- Booking ---------- */
+  .booking{
+    background:var(--gray-light);
+  }
+  .booking-panel{
+    background:var(--white);
+    border:1px solid #d8d5cb;
+  }
+  .progress{
+    display:flex;
+    border-bottom:1px solid #d8d5cb;
+  }
+  .progress-step{
+    flex:1;
+    padding:22px 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-right:1px solid #d8d5cb;
+    opacity:0.4;
+  }
+  .progress-step:last-child{border-right:none;}
+  .progress-step.active{opacity:1;}
+  .progress-step.done{opacity:1;}
+  .progress-num{
+    width:28px;height:28px;
+    border-radius:50%;
+    background:var(--black);
+    color:var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Anton',sans-serif;
+    font-size:13px;
+    flex-shrink:0;
+    transition:background .2s var(--ease);
+  }
+  .progress-step.active .progress-num, .progress-step.done .progress-num{background:var(--red);}
+  .progress-label{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    display:none;
+  }
+  @media(min-width:860px){.progress-label{display:block;}}
+
+  .booking-body{
+    padding:44px;
+    min-height:420px;
+  }
+  .step-title{
+    font-family:'Anton',sans-serif;
+    font-size:26px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .step-sub{
+    color:#666;
+    font-size:14px;
+    margin-bottom:32px;
+  }
+
+  .option-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+  }
+  .option-card{
+    border:1.5px solid #ddd9cd;
+    padding:22px;
+    cursor:pointer;
+    transition:border-color .18s var(--ease), background .18s var(--ease);
+    text-align:left;
+  }
+  .option-card:hover{border-color:var(--black);}
+  .option-card.selected{
+    border-color:var(--red);
+    background:#fdf3f3;
+  }
+  .option-card .opt-name{
+    font-family:'Anton',sans-serif;
+    font-size:18px;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .option-card .opt-meta{
+    font-size:13px;
+    color:#666;
+  }
+  .option-card .opt-price{
+    margin-top:14px;
+    font-family:'Anton',sans-serif;
+    color:var(--red);
+    font-size:17px;
+  }
+  .option-card .opt-avatar{
+    width:44px;height:44px;
+    border-radius:50%;
+    background:var(--black);
+    color:var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Anton',sans-serif;
+    margin-bottom:14px;
+  }
+
+  .day-scroll{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    margin-bottom:30px;
+  }
+  .day-chip{
+    flex-shrink:0;
+    width:66px;
+    border:1.5px solid #ddd9cd;
+    padding:12px 0;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .18s var(--ease), background .18s var(--ease);
+  }
+  .day-chip:hover{border-color:var(--black);}
+  .day-chip.selected{border-color:var(--red); background:#fdf3f3;}
+  .day-chip .dchip-dow{font-size:11px; text-transform:uppercase; color:#888;}
+  .day-chip .dchip-num{font-family:'Anton',sans-serif; font-size:20px; margin-top:2px;}
+
+  .time-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+    gap:10px;
+  }
+  .time-chip{
+    border:1.5px solid #ddd9cd;
+    padding:12px 0;
+    text-align:center;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:border-color .18s var(--ease), background .18s var(--ease), color .18s var(--ease);
+  }
+  .time-chip:hover:not(.disabled){border-color:var(--black);}
+  .time-chip.selected{border-color:var(--red); background:var(--red); color:var(--white);}
+  .time-chip.disabled{
+    color:#bbb;
+    text-decoration:line-through;
+    cursor:not-allowed;
+    background:#f4f2ec;
+  }
+
+  .form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+  .form-field{display:flex; flex-direction:column; gap:8px;}
+  .form-field.full{grid-column:1/-1;}
+  .form-field label{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:#555;
+  }
+  .form-field input, .form-field textarea{
+    border:1.5px solid #ddd9cd;
+    padding:14px 16px;
+    font-size:15px;
+    background:var(--white);
+    transition:border-color .18s var(--ease);
+  }
+  .form-field input:focus, .form-field textarea:focus{
+    border-color:var(--black);
+    outline:none;
+  }
+
+  .summary-card{
+    border:1.5px solid #ddd9cd;
+    padding:28px;
+  }
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    padding:14px 0;
+    border-bottom:1px solid #ece9de;
+    font-size:15px;
+  }
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row span:first-child{color:#777;}
+  .summary-row span:last-child{font-weight:700;}
+  .summary-total{
+    display:flex;
+    justify-content:space-between;
+    margin-top:18px;
+    padding-top:18px;
+    border-top:2px solid var(--black);
+    font-family:'Anton',sans-serif;
+    font-size:22px;
+  }
+  .summary-total span:last-child{color:var(--red);}
+
+  .booking-nav{
+    display:flex;
+    justify-content:space-between;
+    padding:26px 44px;
+    border-top:1px solid #d8d5cb;
+  }
+  .btn-dark{
+    background:var(--black);
+    color:var(--white);
+    padding:15px 28px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    transition:background .2s var(--ease);
+  }
+  .btn-dark:hover{background:#000;}
+  .btn-dark:disabled{background:#ccc; cursor:not-allowed;}
+  .btn-outline{
+    border:1.5px solid #ccc;
+    padding:15px 28px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    transition:border-color .2s var(--ease);
+  }
+  .btn-outline:hover{border-color:var(--black);}
+  .btn-outline:disabled{opacity:0.3; cursor:not-allowed;}
+
+  .step-pane{display:none;}
+  .step-pane.active{display:block; animation:fade-in .3s var(--ease);}
+  @keyframes fade-in{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .confirm-screen{
+    text-align:center;
+    padding:30px 0;
+  }
+  .confirm-check{
+    width:74px;height:74px;
+    border-radius:50%;
+    background:var(--black);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 26px;
+  }
+  .confirm-code{
+    display:inline-block;
+    margin-top:8px;
+    border:1.5px dashed var(--red);
+    padding:10px 22px;
+    font-family:'Anton',sans-serif;
+    font-size:20px;
+    letter-spacing:0.08em;
+    color:var(--red);
+  }
+
+  /* ---------- Location / Footer ---------- */
+  .location{
+    background:var(--black);
+    color:var(--white);
+  }
+  .location .wrap{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:60px;
+  }
+  .loc-map{
+    aspect-ratio:16/11;
+    background:var(--black-soft);
+    border:1px solid var(--gray-line);
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .loc-list li{
+    display:flex;
+    gap:16px;
+    padding:18px 0;
+    border-top:1px solid var(--gray-line);
+  }
+  .loc-list li:last-child{border-bottom:1px solid var(--gray-line);}
+  .loc-list b{display:block; font-size:14px; margin-bottom:4px;}
+  .loc-list span{color:var(--gray-mid); font-size:14px;}
+
+  footer{
+    background:var(--black);
+    border-top:1px solid var(--gray-line);
+    padding:40px 0;
+    color:var(--gray-mid);
+    font-size:13px;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  footer a{color:var(--white); font-weight:600;}
+  .footer-social{display:flex; gap:20px;}
+
+  /* ---------- Staff Portal ---------- */
+  .staff-portal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:var(--white);
+    overflow-y:auto;
+  }
+  .staff-portal.open{display:block;}
+
+  .staff-topbar{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:var(--black);
+    color:var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 28px;
+    border-bottom:1px solid var(--gray-line);
+  }
+  .staff-topbar .logo{font-size:17px;}
+  .staff-topbar-actions{display:flex; align-items:center; gap:14px;}
+  .staff-topbar-actions span{
+    font-size:13px;
+    color:var(--gray-mid);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .staff-btn{
+    border:1px solid rgba(250,249,246,0.3);
+    color:var(--white);
+    padding:10px 18px;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    border-radius:var(--radius);
+    transition:border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .staff-btn:hover{border-color:var(--white); background:rgba(255,255,255,0.08);}
+
+  .staff-login-wrap{
+    min-height:calc(100vh - 65px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    background:var(--gray-light);
+  }
+  .staff-login-card{
+    background:var(--white);
+    border:1px solid #d8d5cb;
+    width:100%;
+    max-width:400px;
+    padding:40px 34px;
+  }
+  .staff-login-card .eyebrow{color:var(--red); margin-bottom:16px;}
+  .staff-login-card h2{font-size:28px; margin-bottom:8px;}
+  .staff-login-card .step-sub{margin-bottom:28px;}
+  .staff-error{
+    color:var(--red);
+    font-size:13px;
+    font-weight:600;
+    margin-top:14px;
+    display:none;
+  }
+  .staff-error.show{display:block;}
+  .staff-hint{
+    margin-top:26px;
+    padding-top:20px;
+    border-top:1px solid #ece9de;
+    font-size:12px;
+    color:#999;
+    line-height:1.7;
+  }
+  .staff-hint b{color:#777;}
+
+  .staff-dashboard{
+    max-width:1180px;
+    margin:0 auto;
+    padding:44px 32px 90px;
+  }
+  .staff-dashboard-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:20px;
+    margin-bottom:34px;
+  }
+  .staff-dashboard-head h2{font-size:clamp(28px,4vw,40px);}
+  .staff-stats{
+    display:flex;
+    gap:28px;
+    margin-top:14px;
+  }
+  .staff-stats div b{
+    font-family:'Anton',sans-serif;
+    font-size:24px;
+    display:block;
+  }
+  .staff-stats div span{
+    font-size:11px;
+    color:#888;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+
+  .staff-filters{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:28px;
+  }
+  .filter-tab{
+    border:1.5px solid #ddd9cd;
+    padding:10px 20px;
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    transition:border-color .18s var(--ease), background .18s var(--ease), color .18s var(--ease);
+  }
+  .filter-tab:hover{border-color:var(--black);}
+  .filter-tab.active{background:var(--black); border-color:var(--black); color:var(--white);}
+
+  .booking-day-group{margin-bottom:34px;}
+  .booking-day-title{
+    font-family:'Anton',sans-serif;
+    font-size:15px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--red);
+    margin-bottom:14px;
+    padding-bottom:10px;
+    border-bottom:2px solid var(--black);
+  }
+
+  .booking-row{
+    display:grid;
+    grid-template-columns:74px 1.3fr 1fr 1fr 1fr auto;
+    gap:16px;
+    align-items:center;
+    padding:16px 18px;
+    border:1px solid #e6e3d8;
+    margin-bottom:10px;
+    background:var(--white);
+  }
+  .booking-row .b-time{
+    font-family:'Anton',sans-serif;
+    font-size:16px;
+  }
+  .booking-row .b-label{
+    display:none;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:#999;
+    margin-bottom:2px;
+  }
+  .booking-row .b-name{font-weight:700; font-size:14px;}
+  .booking-row .b-sub{font-size:13px; color:#666;}
+  .booking-actions{display:flex; gap:8px; justify-self:end;}
+  .icon-btn{
+    width:36px;height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1.5px solid #ddd9cd;
+    transition:border-color .18s var(--ease), background .18s var(--ease);
+    flex-shrink:0;
+  }
+  .icon-btn:hover{border-color:var(--black);}
+  .icon-btn.danger:hover{border-color:var(--red); background:#fdf3f3;}
+
+  .edit-panel{
+    grid-column:1/-1;
+    margin-top:14px;
+    padding-top:18px;
+    border-top:1px dashed #ddd9cd;
+    display:none;
+  }
+  .edit-panel.open{display:block;}
+  .edit-panel .form-grid{margin-bottom:18px;}
+  .edit-panel-actions{display:flex; gap:12px; justify-content:flex-end;}
+
+  .empty-state{
+    text-align:center;
+    padding:70px 20px;
+    color:#999;
+  }
+  .empty-state h4{
+    font-family:'Anton',sans-serif;
+    font-size:20px;
+    text-transform:uppercase;
+    color:var(--black);
+    margin-bottom:8px;
+  }
+
+  .new-booking-btn{
+    background:var(--red);
+    color:var(--white);
+    padding:14px 24px;
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    transition:background .2s var(--ease);
+  }
+  .new-booking-btn:hover{background:var(--red-dark);}
+
+  .manual-form-wrap{
+    border:1.5px solid var(--black);
+    padding:28px;
+    margin-bottom:34px;
+    display:none;
+  }
+  .manual-form-wrap.open{display:block;}
+
+  /* ---------- Responsive ---------- */
+  @media(max-width:1024px){
+    .service-grid{grid-template-columns:1fr 1fr;}
+    .team-grid{max-width:none;}
+    .booking-row{
+      grid-template-columns:1fr 1fr;
+      row-gap:10px;
+    }
+    .booking-row .b-time{grid-column:1/-1; font-size:18px;}
+    .booking-row .b-label{display:block;}
+    .booking-actions{grid-column:1/-1; justify-self:start; margin-top:8px;}
+  }
+  @media(max-width:940px){
+    .nav-links{display:none;}
+    .nav-cta{display:none;}
+    .burger{display:flex;}
+    .hero .wrap{grid-template-columns:1fr;}
+    .hero-visual{order:-1; margin-bottom:20px;}
+    .pole{height:260px; width:70px;}
+    .about .wrap{grid-template-columns:1fr;}
+    .service-grid{grid-template-columns:1fr 1fr;}
+    .team-grid{grid-template-columns:1fr 1fr 1fr;}
+    .location .wrap{grid-template-columns:1fr;}
+    .form-grid{grid-template-columns:1fr;}
+    .progress-step{padding:16px 10px;}
+    .staff-dashboard{padding:34px 20px 70px;}
+    .staff-dashboard-head{flex-direction:column; align-items:flex-start;}
+  }
+  @media(max-width:768px){
+    .team-grid{grid-template-columns:1fr 1fr;}
+    .day-chip{width:58px;}
+    .option-grid{grid-template-columns:1fr;}
+  }
+  @media(max-width:600px){
+    .wrap{padding:0 20px;}
+    section{padding:80px 0;}
+    .service-grid{grid-template-columns:1fr;}
+    .team-grid{grid-template-columns:1fr 1fr;}
+    .booking-body{padding:26px 20px;}
+    .booking-nav{padding:20px;}
+    .hero{padding:150px 0 70px;}
+    .staff-topbar{padding:14px 18px;}
+    .staff-topbar .logo{font-size:14px;}
+    .staff-topbar-actions span{display:none;}
+    .staff-login-card{padding:30px 22px;}
+    .staff-filters{gap:8px;}
+    .filter-tab{padding:9px 14px; font-size:12px;}
+    .booking-day-group{margin-bottom:26px;}
+    .icon-btn{width:40px; height:40px;}
+  }
+  @media(max-width:420px){
+    .hero-stats{gap:20px;}
+    .team-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="dot"></span>BLACK <span style="color:var(--red)">&amp;</span> WHITE</div>
+    <nav class="nav-links">
+      <a href="#servicos">Serviços</a>
+      <a href="#sobre">Sobre</a>
+      <a href="#equipe">Equipe</a>
+      <a href="#local">Localização</a>
+      <button class="nav-staff-link" id="openStaffPortal" type="button">Área do barbeiro</button>
+    </nav>
+    <a href="#agendar" class="nav-cta">Agendar</a>
+    <button class="burger" id="burgerBtn" aria-label="Abrir menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#servicos">Serviços</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#equipe">Equipe</a>
+    <a href="#local">Localização</a>
+    <button class="nav-staff-link mobile" id="openStaffPortalMobile" type="button">Área do barbeiro</button>
+    <a href="#agendar" class="nav-cta" style="width:fit-content;">Agendar</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Barbearia desde 2016</div>
+      <h1>Corte com<br>precisão. <em>Estilo</em><br>sem esforço.</h1>
+      <p class="lede">Cortes clássicos e contemporâneos, barba bem feita e um ambiente pensado para você relaxar. Agende em menos de um minuto, sem ligação e sem fila.</p>
+      <div class="hero-actions">
+        <a href="#agendar" class="btn-primary">Agendar horário</a>
+        <a href="#servicos" class="btn-ghost">Ver serviços</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>8+</b><span>Anos de estrada</span></div>
+        <div><b>12k</b><span>Cortes entregues</span></div>
+        <div><b>4.9</b><span>Avaliação média</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="pole-cap top"></div>
+      <div class="pole"></div>
+      <div class="pole-cap bottom"></div>
+    </div>
+  </div>
+</section>
+
+<div class="stripe-divider"></div>
+
+<!-- SERVICES -->
+<section class="services" id="servicos">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">O que fazemos</div>
+      <h2>Serviços</h2>
+      <p>Cada serviço é executado por profissionais treinados, com produtos de qualidade e tempo dedicado — sem pressa, sem descuido.</p>
+    </div>
+  </div>
+  <div class="wrap" style="padding:0;">
+    <div class="service-grid" id="serviceGrid"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="sobre">
+  <div class="wrap">
+    <div class="about-visual">
+      <svg viewBox="0 0 200 200" fill="none">
+        <circle cx="60" cy="150" r="18" stroke="#faf9f6" stroke-width="6"/>
+        <circle cx="60" cy="60" r="18" stroke="#faf9f6" stroke-width="6"/>
+        <path d="M75 65 L170 175" stroke="#faf9f6" stroke-width="6" stroke-linecap="round"/>
+        <path d="M75 145 L170 25" stroke="#faf9f6" stroke-width="6" stroke-linecap="round"/>
+        <path d="M75 105 L120 105" stroke="#c8102e" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="eyebrow">Nossa essência</div>
+      <h2 style="color:var(--white); font-size:clamp(30px,4vw,46px);">Tradição de barbearia, padrão de hoje</h2>
+      <p style="color:var(--gray-mid); margin-top:16px; font-size:16px; line-height:1.65;">Misturamos técnica clássica de navalha com as tendências atuais de corte. Cada cadeira é um espaço só seu — sem pressa, sem julgamento, só o resultado certo.</p>
+      <ul class="about-list">
+        <li>
+          <span class="mark">—</span>
+          <div><h4>Profissionais certificados</h4><p>Equipe com formação contínua em técnicas clássicas e modernas.</p></div>
+        </li>
+        <li>
+          <span class="mark">—</span>
+          <div><h4>Produtos premium</h4><p>Linhas selecionadas para couro cabeludo, barba e pele sensível.</p></div>
+        </li>
+        <li>
+          <span class="mark">—</span>
+          <div><h4>Agenda sem fricção</h4><p>Escolha serviço, profissional e horário em poucos cliques, sem ligação.</p></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="stripe-divider thin"></div>
+
+<!-- TEAM -->
+<section class="team" id="equipe">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Quem corta</div>
+      <h2>Nossa equipe</h2>
+      <p>Escolha o profissional com quem você já tem confiança — ou conheça um novo estilo direto no agendamento.</p>
+    </div>
+    <div class="team-grid" id="teamGrid"></div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section class="booking" id="agendar">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Reserve seu horário</div>
+      <h2>Agendamento</h2>
+      <p>Cinco passos rápidos: serviço, profissional, data, seus dados e confirmação.</p>
+    </div>
+
+    <div class="booking-panel">
+      <div class="progress" id="progressBar"></div>
+
+      <div class="booking-body">
+
+        <!-- STEP 1: SERVICE -->
+        <div class="step-pane active" data-step="1">
+          <div class="step-title">Escolha o serviço</div>
+          <div class="step-sub">Selecione o que você quer fazer hoje.</div>
+          <div class="option-grid" id="bookServiceGrid"></div>
+        </div>
+
+        <!-- STEP 2: BARBER -->
+        <div class="step-pane" data-step="2">
+          <div class="step-title">Escolha o profissional</div>
+          <div class="step-sub">Ou selecione "Sem preferência" para o primeiro horário disponível.</div>
+          <div class="option-grid" id="bookBarberGrid"></div>
+        </div>
+
+        <!-- STEP 3: DATE/TIME -->
+        <div class="step-pane" data-step="3">
+          <div class="step-title">Data e horário</div>
+          <div class="step-sub">Horários em cinza já estão reservados.</div>
+          <div class="day-scroll" id="dayScroll"></div>
+          <div class="time-grid" id="timeGrid"></div>
+        </div>
+
+        <!-- STEP 4: DETAILS -->
+        <div class="step-pane" data-step="4">
+          <div class="step-title">Seus dados</div>
+          <div class="step-sub">Usamos só para confirmar e lembrar do seu horário.</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="fName">Nome completo</label>
+              <input type="text" id="fName" placeholder="Seu nome" autocomplete="name">
+            </div>
+            <div class="form-field">
+              <label for="fPhone">Telefone / WhatsApp</label>
+              <input type="tel" id="fPhone" placeholder="(11) 90000-0000" autocomplete="tel">
+            </div>
+            <div class="form-field full">
+              <label for="fEmail">E-mail</label>
+              <input type="email" id="fEmail" placeholder="voce@email.com" autocomplete="email">
+            </div>
+            <div class="form-field full">
+              <label for="fNote">Observação (opcional)</label>
+              <textarea id="fNote" rows="3" placeholder="Alguma preferência de corte ou observação"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: CONFIRM -->
+        <div class="step-pane" data-step="5">
+          <div class="step-title">Confirme seu agendamento</div>
+          <div class="step-sub">Revise os detalhes antes de confirmar.</div>
+          <div class="summary-card" id="summaryCard"></div>
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="step-pane" data-step="success">
+          <div class="confirm-screen">
+            <div class="confirm-check">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#faf9f6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 style="font-size:26px; text-transform:uppercase;">Horário confirmado</h3>
+            <p style="color:#666; margin-top:10px;">Enviamos os detalhes para o e-mail informado. Chegue com 5 minutos de antecedência.</p>
+            <div class="confirm-code" id="confirmCode">BW-0000</div>
+            <div style="margin-top:34px;">
+              <button class="btn-dark" id="newBookingBtn">Fazer novo agendamento</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="booking-nav" id="bookingNav">
+        <button class="btn-outline" id="prevBtn">Voltar</button>
+        <button class="btn-dark" id="nextBtn">Próximo</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stripe-divider"></div>
+
+<!-- LOCATION -->
+<section class="location" id="local">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Onde estamos</div>
+      <h2 style="color:var(--white); font-size:clamp(28px,3.6vw,40px);">Visite a barbearia</h2>
+      <ul class="loc-list" style="margin-top:26px;">
+        <li><div><b>Endereço</b><span>Rua das Tesouras, 128 — Centro, São Paulo/SP</span></div></li>
+        <li><div><b>Horário</b><span>Ter—Sáb, 9h às 20h · Dom—Seg, fechado</span></div></li>
+        <li><div><b>Contato</b><span>(11) 4002-8922 · contato@blackandwhite.com.br</span></div></li>
+      </ul>
+    </div>
+    <div class="loc-map">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-7.58 7-13A7 7 0 0 0 5 9c0 5.42 7 13 7 13Z" stroke="#c8102e" stroke-width="1.6"/><circle cx="12" cy="9" r="2.6" stroke="#c8102e" stroke-width="1.6"/></svg>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; width:100%;">
+    <span>© 2026 Black &amp; White Barbearia. Todos os direitos reservados.</span>
+    <div class="footer-social">
+      <a href="#">Instagram</a>
+      <a href="#">WhatsApp</a>
+      <a href="#agendar">Agendar</a>
+    </div>
+  </div>
+</footer>
+
+<!-- STAFF PORTAL -->
+<div class="staff-portal" id="staffPortal">
+  <div class="staff-topbar">
+    <div class="logo"><span class="dot"></span>BLACK <span style="color:var(--red)">&amp;</span> WHITE</div>
+    <div class="staff-topbar-actions">
+      <span id="staffWhoami"></span>
+      <button class="staff-btn" id="staffLogoutBtn" style="display:none;">Sair</button>
+      <button class="staff-btn" id="staffCloseBtn">Fechar</button>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="staff-login-wrap" id="staffLoginWrap">
+    <div class="staff-login-card">
+      <div class="eyebrow">Acesso restrito</div>
+      <h2>Área do barbeiro</h2>
+      <p class="step-sub">Entre com seu e-mail e senha para ver e gerenciar a agenda.</p>
+      <form id="staffLoginForm">
+        <div class="form-grid" style="grid-template-columns:1fr;">
+          <div class="form-field">
+            <label for="staffUser">E-mail</label>
+            <input type="email" id="staffUser" autocomplete="username" placeholder="seuemail@blackandwhite.com.br">
+          </div>
+          <div class="form-field">
+            <label for="staffPass">Senha</label>
+            <input type="password" id="staffPass" autocomplete="current-password" placeholder="••••••••">
+          </div>
+        </div>
+        <button type="submit" class="btn-dark" style="width:100%; margin-top:20px;">Entrar</button>
+        <div class="staff-error" id="staffError">E-mail ou senha incorretos.</div>
+      </form>
+      <div class="staff-hint">
+        <b>Como criar o acesso:</b> cada barbeiro precisa de um usuário criado em
+        Authentication → Users no painel do Supabase, com o e-mail cadastrado em
+        <code>staffDirectory</code> no código do site. Veja o LEIA-ME-DEPLOY.md.
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="staff-dashboard" id="staffDashboard" style="display:none;">
+    <div class="staff-dashboard-head">
+      <div>
+        <div class="eyebrow">Painel de agenda</div>
+        <h2>Todos os agendamentos</h2>
+        <div class="staff-stats" id="staffStats"></div>
+      </div>
+      <button class="new-booking-btn" id="toggleManualForm">+ Novo agendamento manual</button>
+    </div>
+
+    <div class="manual-form-wrap" id="manualFormWrap">
+      <div class="step-title" style="font-size:20px;">Adicionar agendamento</div>
+      <div class="form-grid" style="margin-top:18px;">
+        <div class="form-field">
+          <label for="mService">Serviço</label>
+          <select id="mService"></select>
+        </div>
+        <div class="form-field">
+          <label for="mBarber">Barbeiro</label>
+          <select id="mBarber"></select>
+        </div>
+        <div class="form-field">
+          <label for="mDate">Data</label>
+          <input type="date" id="mDate">
+        </div>
+        <div class="form-field">
+          <label for="mTime">Horário</label>
+          <input type="time" id="mTime">
+        </div>
+        <div class="form-field">
+          <label for="mName">Nome do cliente</label>
+          <input type="text" id="mName" placeholder="Nome completo">
+        </div>
+        <div class="form-field">
+          <label for="mPhone">Telefone</label>
+          <input type="tel" id="mPhone" placeholder="(11) 90000-0000">
+        </div>
+      </div>
+      <div class="edit-panel-actions">
+        <button class="btn-outline" id="cancelManualBtn" type="button">Cancelar</button>
+        <button class="btn-dark" id="saveManualBtn" type="button">Salvar agendamento</button>
+      </div>
+    </div>
+
+    <div class="staff-filters" id="staffFilters"></div>
+    <div id="bookingListWrap"></div>
+  </div>
+</div>
+
+<!-- Conexão com o banco de dados (Supabase) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ================= CONFIGURAÇÃO DO SUPABASE =================
+     Substitua os dois valores abaixo pelos do SEU projeto Supabase.
+     Encontre-os em: Project Settings > API, no painel do Supabase.
+     Instruções completas no arquivo LEIA-ME-DEPLOY.md.            */
+  const SUPABASE_URL = 'https://kqrahuwaccdgirngwswq.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxcmFodXdhY2NkZ2lybmd3c3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxMDI1NjgsImV4cCI6MjA5OTY3ODU2OH0.tOBdFYd7LnaD3E9NzQZsgyUThcdKmpF4SqPNB8xOnkg';
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false } // barbeiro faz login toda vez que abre o painel
+  });
+  /* =============================================================== */
+
+  /* ---------------- DATA ---------------- */
+  const services = [
+    {id:'corte', name:'Corte clássico', desc:'Tesoura e máquina, acabamento na navalha.', price:45},
+    {id:'barba', name:'Barba completa', desc:'Toalha quente, navalha e hidratação.', price:35},
+    {id:'combo', name:'Corte + barba', desc:'O pacote completo, de cabeça a queixo.', price:70},
+    {id:'sobrancelha', name:'Sobrancelha', desc:'Alinhamento na navalha.', price:15},
+    {id:'platinado', name:'Platinado / cor', desc:'Descoloração ou coloração completa.', price:120},
+    {id:'infantil', name:'Corte infantil', desc:'Para os pequenos, com paciência extra.', price:35},
+    {id:'progressiva', name:'Progressiva', desc:'Alinhamento e redução de volume dos fios.', price:45},
+    {id:'alisamento', name:'Alisamento', desc:'Efeito liso natural, sem agredir os fios.', price:15},
+  ];
+
+  const barbers = [
+    {id:'any', name:'Sem preferência', initials:'—'},
+    {id:'thales', name:'Thales', initials:'TH'},
+    {id:'marcelo', name:'Marcelo', initials:'MA'},
+    {id:'darlheson', name:'Darlheson', initials:'DA'},
+  ];
+
+  const teamDisplay = [
+    {name:'Thales', initials:'TH'},
+    {name:'Marcelo', initials:'MA'},
+    {name:'Darlheson', initials:'DA'},
+  ];
+
+  const steps = ['1','2','3','4','5'];
+  const stepLabels = ['Serviço','Profissional','Data e hora','Seus dados','Confirmar'];
+
+  const state = {
+    stepIndex: 0, // index into steps array
+    service: null,
+    barber: null,
+    day: null,
+    time: null,
+    name:'', phone:'', email:'', note:''
+  };
+
+  /* ---------------- STAFF DIRECTORY -----------------------------
+     A autenticação real (senha, sessão) é feita pelo Supabase Auth.
+     Este objeto só serve para o site saber qual barbeiro (slug usado
+     nos agendamentos) corresponde a cada e-mail de login. Os e-mails
+     precisam ser os mesmos cadastrados em Authentication > Users no
+     painel do Supabase. */
+  const staffDirectory = {
+    'thales@blackandwhite.com.br':     {barberId:'thales',     name:'Thales'},
+    'marcelo@blackandwhite.com.br':    {barberId:'marcelo',    name:'Marcelo'},
+    'darlheson@blackandwhite.com.br':  {barberId:'darlheson',  name:'Darlheson'},
+  };
+  let currentStaff = null; // {name, barberId} do barbeiro autenticado nesta sessão
+
+  function isoDate(offsetDays){
+    const d = new Date();
+    d.setDate(d.getDate()+offsetDays);
+    return d.toISOString().slice(0,10);
+  }
+
+  /* ---------------- CENTRAL BOOKINGS STORE ------------------------
+     "bookings" é um cache local, recarregado a partir do Supabase
+     sempre que o painel do barbeiro é aberto ou algo muda. */
+  let bookings = [];
+
+  function mapBookingRow(row){
+    return {
+      id: row.id,
+      code: row.code,
+      serviceId: row.service_id,
+      barberId: row.barber_id,
+      date: row.date,
+      time: (row.time || '').slice(0,5),
+      name: row.customer_name,
+      phone: row.customer_phone,
+      email: row.customer_email,
+      note: row.note
+    };
+  }
+
+  async function loadBookingsFromDB(){
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .order('date', { ascending:true })
+      .order('time', { ascending:true });
+    if(error){
+      console.error('Erro ao carregar agendamentos:', error);
+      bookings = [];
+      return false;
+    }
+    bookings = data.map(mapBookingRow);
+    return true;
+  }
+
+  function findService(id){ return services.find(s=>s.id===id); }
+  function findBarber(id){ return barbers.find(b=>b.id===id); }
+
+  /* ---------------- RENDER: services (marketing grid) ---------------- */
+  const serviceGrid = document.getElementById('serviceGrid');
+  services.forEach((s,i)=>{
+    const el = document.createElement('div');
+    el.className = 'service-card';
+    el.innerHTML = `
+      <div class="svc-num">0${i+1}</div>
+      <div class="svc-name">${s.name}</div>
+      <div class="svc-desc">${s.desc}</div>
+      <div class="svc-price">R$ ${s.price}</div>
+    `;
+    serviceGrid.appendChild(el);
+  });
+
+  /* ---------------- RENDER: team (marketing grid) ---------------- */
+  const teamGrid = document.getElementById('teamGrid');
+  teamDisplay.forEach(t=>{
+    const el = document.createElement('div');
+    el.className = 'team-card';
+    el.innerHTML = `
+      <div class="team-photo">${t.initials}</div>
+      <h4>${t.name}</h4>
+    `;
+    teamGrid.appendChild(el);
+  });
+
+  /* ---------------- RENDER: progress bar ---------------- */
+  const progressBar = document.getElementById('progressBar');
+  function renderProgress(){
+    progressBar.innerHTML = '';
+    steps.forEach((s,i)=>{
+      const el = document.createElement('div');
+      el.className = 'progress-step' + (i===state.stepIndex ? ' active' : '') + (i<state.stepIndex ? ' done' : '');
+      el.innerHTML = `<span class="progress-num">${i+1}</span><span class="progress-label">${stepLabels[i]}</span>`;
+      progressBar.appendChild(el);
+    });
+  }
+
+  /* ---------------- RENDER: booking service options ---------------- */
+  const bookServiceGrid = document.getElementById('bookServiceGrid');
+  services.forEach(s=>{
+    const el = document.createElement('div');
+    el.className = 'option-card';
+    el.setAttribute('role','button');
+    el.tabIndex = 0;
+    el.dataset.id = s.id;
+    el.innerHTML = `
+      <div class="opt-name">${s.name}</div>
+      <div class="opt-price">R$ ${s.price}</div>
+    `;
+    el.addEventListener('click', ()=>selectService(s));
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); selectService(s);} });
+    bookServiceGrid.appendChild(el);
+  });
+  function selectService(s){
+    state.service = s;
+    [...bookServiceGrid.children].forEach(c=>c.classList.toggle('selected', c.dataset.id===s.id));
+    updateNavState();
+  }
+
+  /* ---------------- RENDER: booking barber options ---------------- */
+  const bookBarberGrid = document.getElementById('bookBarberGrid');
+  barbers.forEach(b=>{
+    const el = document.createElement('div');
+    el.className = 'option-card';
+    el.setAttribute('role','button');
+    el.tabIndex = 0;
+    el.dataset.id = b.id;
+    el.innerHTML = `
+      <div class="opt-avatar">${b.initials}</div>
+      <div class="opt-name">${b.name}</div>
+    `;
+    el.addEventListener('click', ()=>selectBarber(b));
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); selectBarber(b);} });
+    bookBarberGrid.appendChild(el);
+  });
+  function selectBarber(b){
+    state.barber = b;
+    [...bookBarberGrid.children].forEach(c=>c.classList.toggle('selected', c.dataset.id===b.id));
+    updateNavState();
+  }
+
+  /* ---------------- RENDER: day scroll + time grid ---------------- */
+  const dayScroll = document.getElementById('dayScroll');
+  const timeGrid = document.getElementById('timeGrid');
+  const dowNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const days = [];
+  const today = new Date();
+  for(let i=0;i<14;i++){
+    const d = new Date(today);
+    d.setDate(today.getDate()+i);
+    if(d.getDay()===0 || d.getDay()===1) continue; // fechado dom/seg
+    days.push(d);
+  }
+  days.forEach((d,i)=>{
+    const el = document.createElement('div');
+    el.className = 'day-chip';
+    el.tabIndex = 0;
+    el.dataset.idx = i;
+    el.innerHTML = `<div class="dchip-dow">${dowNames[d.getDay()]}</div><div class="dchip-num">${d.getDate()}</div>`;
+    el.addEventListener('click', ()=>selectDay(i, d));
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); selectDay(i,d);} });
+    dayScroll.appendChild(el);
+  });
+
+  const allTimes = ['09:00','09:40','10:20','11:00','11:40','13:00','13:40','14:20','15:00','15:40','16:20','17:00','17:40','18:20','19:00'];
+
+  async function getBookedTimes(dateIso, barberId){
+    const { data, error } = await supabase.rpc('get_booked_times', {
+      p_date: dateIso,
+      p_barber_id: barberId || null
+    });
+    if(error){
+      console.error('Erro ao consultar horários:', error);
+      return new Set();
+    }
+    return new Set(data.map(r => (r.time_slot || '').slice(0,5)));
+  }
+
+  function selectDay(idx, dateObj){
+    state.day = {idx, date: dateObj};
+    state.time = null;
+    [...dayScroll.children].forEach(c=>c.classList.toggle('selected', Number(c.dataset.idx)===idx));
+    renderTimeGrid(dateObj);
+    updateNavState();
+  }
+
+  async function renderTimeGrid(dateObj){
+    timeGrid.innerHTML = '<div style="grid-column:1/-1; color:#999; font-size:14px;">Carregando horários…</div>';
+    const dateIso = dateObj.toISOString().slice(0,10);
+    const barberId = state.barber ? state.barber.id : null;
+    const unavailable = await getBookedTimes(dateIso, barberId);
+
+    timeGrid.innerHTML = '';
+    allTimes.forEach(t=>{
+      const el = document.createElement('div');
+      const isDisabled = unavailable.has(t);
+      el.className = 'time-chip' + (isDisabled ? ' disabled':'');
+      el.textContent = t;
+      if(!isDisabled){
+        el.tabIndex = 0;
+        el.addEventListener('click', ()=>selectTime(t, el));
+        el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); selectTime(t, el);} });
+      }
+      timeGrid.appendChild(el);
+    });
+  }
+  function selectTime(t, el){
+    state.time = t;
+    [...timeGrid.children].forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+    updateNavState();
+  }
+
+  /* ---------------- FORM ---------------- */
+  const fName = document.getElementById('fName');
+  const fPhone = document.getElementById('fPhone');
+  const fEmail = document.getElementById('fEmail');
+  const fNote = document.getElementById('fNote');
+  [fName,fPhone,fEmail,fNote].forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      state.name = fName.value.trim();
+      state.phone = fPhone.value.trim();
+      state.email = fEmail.value.trim();
+      state.note = fNote.value.trim();
+      updateNavState();
+    });
+  });
+
+  /* ---------------- SUMMARY ---------------- */
+  const summaryCard = document.getElementById('summaryCard');
+  function renderSummary(){
+    const d = state.day ? state.day.date : null;
+    const dateStr = d ? `${dowNames[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}` : '—';
+    summaryCard.innerHTML = `
+      <div class="summary-row"><span>Serviço</span><span>${state.service ? state.service.name : '—'}</span></div>
+      <div class="summary-row"><span>Profissional</span><span>${state.barber ? state.barber.name : '—'}</span></div>
+      <div class="summary-row"><span>Data</span><span>${dateStr}</span></div>
+      <div class="summary-row"><span>Horário</span><span>${state.time || '—'}</span></div>
+      <div class="summary-row"><span>Cliente</span><span>${state.name || '—'}</span></div>
+      <div class="summary-row"><span>Contato</span><span>${state.phone || '—'}</span></div>
+      <div class="summary-total"><span>Total</span><span>R$ ${state.service ? state.service.price : 0}</span></div>
+    `;
+  }
+
+  /* ---------------- STEP NAVIGATION ---------------- */
+  const panes = [...document.querySelectorAll('.step-pane')];
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const bookingNav = document.getElementById('bookingNav');
+
+  function showStep(){
+    panes.forEach(p=>p.classList.toggle('active', p.dataset.step===steps[state.stepIndex]));
+    renderProgress();
+    prevBtn.style.visibility = state.stepIndex===0 ? 'hidden' : 'visible';
+    nextBtn.textContent = state.stepIndex===steps.length-1 ? 'Confirmar agendamento' : 'Próximo';
+    if(state.stepIndex===4) renderSummary();
+    updateNavState();
+  }
+
+  function stepValid(){
+    switch(state.stepIndex){
+      case 0: return !!state.service;
+      case 1: return !!state.barber;
+      case 2: return !!(state.day && state.time);
+      case 3: return state.name.length>1 && state.phone.length>7 && /\S+@\S+\.\S+/.test(state.email);
+      case 4: return true;
+      default: return true;
+    }
+  }
+  function updateNavState(){
+    nextBtn.disabled = !stepValid();
+  }
+
+  prevBtn.addEventListener('click', ()=>{
+    if(state.stepIndex>0){ state.stepIndex--; showStep(); }
+  });
+  nextBtn.addEventListener('click', async ()=>{
+    if(!stepValid()) return;
+    if(state.stepIndex < steps.length-1){
+      state.stepIndex++;
+      showStep();
+    } else {
+      await completeBooking();
+    }
+  });
+
+  async function completeBooking(){
+    nextBtn.disabled = true;
+    nextBtn.textContent = 'Confirmando…';
+
+    const { data, error } = await supabase.rpc('create_booking', {
+      p_service_id: state.service.id,
+      p_barber_id: state.barber.id,
+      p_date: state.day.date.toISOString().slice(0,10),
+      p_time: state.time,
+      p_customer_name: state.name,
+      p_customer_phone: state.phone,
+      p_customer_email: state.email,
+      p_note: state.note
+    });
+
+    if(error || !data || !data[0]){
+      console.error('Erro ao criar agendamento:', error);
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'Confirmar agendamento';
+      window.alert('Não foi possível confirmar o agendamento agora. Verifique sua conexão e tente novamente.');
+      return;
+    }
+
+    const code = data[0].code;
+    document.getElementById('confirmCode').textContent = code;
+    panes.forEach(p=>p.classList.remove('active'));
+    document.querySelector('.step-pane[data-step="success"]').classList.add('active');
+    bookingNav.style.display = 'none';
+  }
+
+  document.getElementById('newBookingBtn').addEventListener('click', ()=>{
+    state.stepIndex = 0;
+    state.service = null; state.barber = null; state.day = null; state.time = null;
+    state.name=''; state.phone=''; state.email=''; state.note='';
+    fName.value=''; fPhone.value=''; fEmail.value=''; fNote.value='';
+    [...bookServiceGrid.children].forEach(c=>c.classList.remove('selected'));
+    [...bookBarberGrid.children].forEach(c=>c.classList.remove('selected'));
+    [...dayScroll.children].forEach(c=>c.classList.remove('selected'));
+    timeGrid.innerHTML = '';
+    bookingNav.style.display = 'flex';
+    showStep();
+  });
+
+  showStep();
+
+  /* ---------------- MOBILE MENU ---------------- */
+  const burgerBtn = document.getElementById('burgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burgerBtn.addEventListener('click', ()=>{
+    const open = mobileMenu.classList.toggle('open');
+    burgerBtn.setAttribute('aria-expanded', open);
+  });
+  mobileMenu.querySelectorAll('a').forEach(a=>{
+    a.addEventListener('click', ()=> mobileMenu.classList.remove('open'));
+  });
+
+  /* ================= STAFF PORTAL ================= */
+  const staffPortal = document.getElementById('staffPortal');
+  const staffLoginWrap = document.getElementById('staffLoginWrap');
+  const staffDashboard = document.getElementById('staffDashboard');
+  const staffLoginForm = document.getElementById('staffLoginForm');
+  const staffUser = document.getElementById('staffUser');
+  const staffPass = document.getElementById('staffPass');
+  const staffError = document.getElementById('staffError');
+  const staffWhoami = document.getElementById('staffWhoami');
+  const staffLogoutBtn = document.getElementById('staffLogoutBtn');
+  const staffCloseBtn = document.getElementById('staffCloseBtn');
+  const staffFilters = document.getElementById('staffFilters');
+  const bookingListWrap = document.getElementById('bookingListWrap');
+  const staffStats = document.getElementById('staffStats');
+
+  let activeFilter = 'all';
+  let openEditId = null;
+
+  function openStaffPortal(){
+    staffPortal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if(currentStaff){ showDashboard(); } else { showLogin(); }
+  }
+  function closeStaffPortal(){
+    staffPortal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('openStaffPortal').addEventListener('click', openStaffPortal);
+  document.getElementById('openStaffPortalMobile').addEventListener('click', ()=>{
+    mobileMenu.classList.remove('open');
+    openStaffPortal();
+  });
+  staffCloseBtn.addEventListener('click', closeStaffPortal);
+
+  function showLogin(){
+    staffLoginWrap.style.display = 'flex';
+    staffDashboard.style.display = 'none';
+    staffLogoutBtn.style.display = 'none';
+    staffWhoami.textContent = '';
+    staffError.classList.remove('show');
+    staffPass.value = '';
+  }
+  async function showDashboard(){
+    staffLoginWrap.style.display = 'none';
+    staffDashboard.style.display = 'block';
+    staffLogoutBtn.style.display = 'inline-block';
+    staffWhoami.textContent = 'Logado como ' + currentStaff.name;
+    activeFilter = 'all';
+    renderFilters();
+    bookingListWrap.innerHTML = '<div class="empty-state"><h4>Carregando agenda…</h4></div>';
+    await loadBookingsFromDB();
+    renderBookingList();
+  }
+
+  staffLoginForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    staffError.classList.remove('show');
+    const submitBtn = staffLoginForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Entrando…';
+
+    const email = staffUser.value.trim();
+    const password = staffPass.value;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Entrar';
+
+    if(error || !data.user){
+      staffError.textContent = 'E-mail ou senha incorretos.';
+      staffError.classList.add('show');
+      return;
+    }
+
+    const dir = staffDirectory[email.toLowerCase()];
+    currentStaff = {
+      name: dir ? dir.name : data.user.email,
+      barberId: dir ? dir.barberId : null
+    };
+    await showDashboard();
+  });
+
+  staffLogoutBtn.addEventListener('click', async ()=>{
+    await supabase.auth.signOut();
+    currentStaff = null;
+    showLogin();
+  });
+
+  /* ---------- Filters ---------- */
+  function renderFilters(){
+    const tabs = [{id:'all', label:'Todos'}].concat(barbers.filter(b=>b.id!=='any').map(b=>({id:b.id, label:b.name})));
+    staffFilters.innerHTML = '';
+    tabs.forEach(t=>{
+      const btn = document.createElement('button');
+      btn.className = 'filter-tab' + (t.id===activeFilter ? ' active':'');
+      btn.textContent = t.label;
+      btn.addEventListener('click', ()=>{
+        activeFilter = t.id;
+        renderFilters();
+        renderBookingList();
+      });
+      staffFilters.appendChild(btn);
+    });
+  }
+
+  /* ---------- List rendering ---------- */
+  const dowNamesLong = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  function formatDateLabel(iso){
+    const [y,m,d] = iso.split('-').map(Number);
+    const dateObj = new Date(y, m-1, d);
+    return dowNamesLong[dateObj.getDay()] + ', ' + d + '/' + m;
+  }
+
+  function renderStats(list){
+    const today = isoDate(0);
+    const todayCount = list.filter(b=>b.date===today).length;
+    staffStats.innerHTML = `
+      <div><b>${list.length}</b><span>Agendamentos</span></div>
+      <div><b>${todayCount}</b><span>Hoje</span></div>
+    `;
+  }
+
+  function renderBookingList(){
+    let list = bookings.slice().sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+    if(activeFilter!=='all'){
+      list = list.filter(b=>b.barberId===activeFilter);
+    }
+    renderStats(list);
+    bookingListWrap.innerHTML = '';
+
+    if(list.length===0){
+      bookingListWrap.innerHTML = `<div class="empty-state"><h4>Nenhum agendamento aqui</h4><p>Assim que houver reservas para este filtro, elas aparecem aqui.</p></div>`;
+      return;
+    }
+
+    const groups = {};
+    list.forEach(b=>{ (groups[b.date] = groups[b.date] || []).push(b); });
+
+    Object.keys(groups).sort().forEach(dateKey=>{
+      const groupEl = document.createElement('div');
+      groupEl.className = 'booking-day-group';
+      const title = document.createElement('div');
+      title.className = 'booking-day-title';
+      title.textContent = formatDateLabel(dateKey);
+      groupEl.appendChild(title);
+
+      groups[dateKey].forEach(b=>{
+        groupEl.appendChild(renderBookingRow(b));
+      });
+      bookingListWrap.appendChild(groupEl);
+    });
+  }
+
+  function renderBookingRow(b){
+    const svc = findService(b.serviceId);
+    const brb = findBarber(b.barberId);
+    const row = document.createElement('div');
+    row.className = 'booking-row';
+    row.dataset.id = b.id;
+    row.innerHTML = `
+      <div class="b-time">${b.time}</div>
+      <div>
+        <div class="b-label">Cliente</div>
+        <div class="b-name">${b.name || '—'}</div>
+        <div class="b-sub">${b.phone || ''}</div>
+      </div>
+      <div>
+        <div class="b-label">Serviço</div>
+        <div class="b-sub">${svc ? svc.name : '—'}</div>
+      </div>
+      <div>
+        <div class="b-label">Barbeiro</div>
+        <div class="b-sub">${brb ? brb.name : '—'}</div>
+      </div>
+      <div>
+        <div class="b-label">Código</div>
+        <div class="b-sub">${b.code || '—'}</div>
+      </div>
+      <div class="booking-actions">
+        <button class="icon-btn edit-btn" title="Editar" aria-label="Editar agendamento">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3Z" stroke="#0d0d0d" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn danger delete-btn" title="Excluir" aria-label="Excluir agendamento">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" stroke="#c8102e" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    `;
+    row.querySelector('.edit-btn').addEventListener('click', ()=> toggleEditPanel(b, row));
+    row.querySelector('.delete-btn').addEventListener('click', ()=> deleteBooking(b.id));
+    if(openEditId===b.id){
+      row.appendChild(buildEditPanel(b));
+    }
+    return row;
+  }
+
+  function toggleEditPanel(b, row){
+    if(openEditId===b.id){
+      openEditId = null;
+    } else {
+      openEditId = b.id;
+    }
+    renderBookingList();
+  }
+
+  function buildEditPanel(b){
+    const panel = document.createElement('div');
+    panel.className = 'edit-panel open';
+    const serviceOptions = services.map(s=>`<option value="${s.id}" ${s.id===b.serviceId?'selected':''}>${s.name}</option>`).join('');
+    const barberOptions = barbers.filter(x=>x.id!=='any').map(x=>`<option value="${x.id}" ${x.id===b.barberId?'selected':''}>${x.name}</option>`).join('');
+    panel.innerHTML = `
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Serviço</label>
+          <select class="edit-service">${serviceOptions}</select>
+        </div>
+        <div class="form-field">
+          <label>Barbeiro</label>
+          <select class="edit-barber">${barberOptions}</select>
+        </div>
+        <div class="form-field">
+          <label>Data</label>
+          <input type="date" class="edit-date" value="${b.date}">
+        </div>
+        <div class="form-field">
+          <label>Horário</label>
+          <input type="time" class="edit-time" value="${b.time}">
+        </div>
+        <div class="form-field">
+          <label>Nome do cliente</label>
+          <input type="text" class="edit-name" value="${b.name || ''}">
+        </div>
+        <div class="form-field">
+          <label>Telefone</label>
+          <input type="tel" class="edit-phone" value="${b.phone || ''}">
+        </div>
+      </div>
+      <div class="edit-panel-actions">
+        <button class="btn-outline edit-cancel" type="button">Cancelar</button>
+        <button class="btn-dark edit-save" type="button">Salvar alterações</button>
+      </div>
+    `;
+    panel.querySelector('.edit-cancel').addEventListener('click', ()=>{
+      openEditId = null;
+      renderBookingList();
+    });
+    panel.querySelector('.edit-save').addEventListener('click', async ()=>{
+      const saveBtn = panel.querySelector('.edit-save');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Salvando…';
+
+      const updated = {
+        service_id: panel.querySelector('.edit-service').value,
+        barber_id: panel.querySelector('.edit-barber').value,
+        date: panel.querySelector('.edit-date').value,
+        time: panel.querySelector('.edit-time').value,
+        customer_name: panel.querySelector('.edit-name').value.trim(),
+        customer_phone: panel.querySelector('.edit-phone').value.trim()
+      };
+      const { error } = await supabase.from('bookings').update(updated).eq('id', b.id);
+
+      if(error){
+        console.error('Erro ao salvar alterações:', error);
+        window.alert('Não foi possível salvar as alterações agora. Tente novamente.');
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Salvar alterações';
+        return;
+      }
+      openEditId = null;
+      await loadBookingsFromDB();
+      renderBookingList();
+    });
+    return panel;
+  }
+
+  async function deleteBooking(id){
+    const ok = window.confirm('Excluir este agendamento? Essa ação não pode ser desfeita.');
+    if(!ok) return;
+    const { error } = await supabase.from('bookings').delete().eq('id', id);
+    if(error){
+      console.error('Erro ao excluir agendamento:', error);
+      window.alert('Não foi possível excluir agora. Tente novamente.');
+      return;
+    }
+    if(openEditId===id) openEditId = null;
+    await loadBookingsFromDB();
+    renderBookingList();
+  }
+
+  /* ---------- Manual booking (walk-in) ---------- */
+  const toggleManualForm = document.getElementById('toggleManualForm');
+  const manualFormWrap = document.getElementById('manualFormWrap');
+  const mService = document.getElementById('mService');
+  const mBarber = document.getElementById('mBarber');
+  const mDate = document.getElementById('mDate');
+  const mTime = document.getElementById('mTime');
+  const mName = document.getElementById('mName');
+  const mPhone = document.getElementById('mPhone');
+
+  mService.innerHTML = services.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  mBarber.innerHTML = barbers.filter(x=>x.id!=='any').map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+
+  toggleManualForm.addEventListener('click', ()=>{
+    manualFormWrap.classList.toggle('open');
+    if(manualFormWrap.classList.contains('open')){
+      mDate.value = isoDate(0);
+      mTime.value = '';
+      mName.value = '';
+      mPhone.value = '';
+    }
+  });
+  document.getElementById('cancelManualBtn').addEventListener('click', ()=>{
+    manualFormWrap.classList.remove('open');
+  });
+  document.getElementById('saveManualBtn').addEventListener('click', async ()=>{
+    if(!mDate.value || !mTime.value || mName.value.trim().length<2){
+      window.alert('Preencha data, horário e nome do cliente.');
+      return;
+    }
+    const saveBtn = document.getElementById('saveManualBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Salvando…';
+
+    const { data, error } = await supabase.rpc('create_booking', {
+      p_service_id: mService.value,
+      p_barber_id: mBarber.value,
+      p_date: mDate.value,
+      p_time: mTime.value,
+      p_customer_name: mName.value.trim(),
+      p_customer_phone: mPhone.value.trim(),
+      p_customer_email: '',
+      p_note: ''
+    });
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Salvar agendamento';
+
+    if(error){
+      console.error('Erro ao salvar agendamento manual:', error);
+      window.alert('Não foi possível salvar agora. Tente novamente.');
+      return;
+    }
+    manualFormWrap.classList.remove('open');
+    await loadBookingsFromDB();
+    renderBookingList();
+  });
+
+  /* Close staff portal with Escape */
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape' && staffPortal.classList.contains('open')) closeStaffPortal();
+  });
+
+})();
+</script>
+</body>
+</html>

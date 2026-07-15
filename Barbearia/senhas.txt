@@ -1,0 +1,14 @@
+email: thales@blackandwhite.com.br
+senha: !>d?3ewfp}
+
+
+email: marcelo@blackandwhite.com.br
+senha: >3C4y]EDK}
+
+
+email: darlheson@blackandwhite.com.br
+senha: }7.5M7TqZk
+
+
+https://kqrahuwaccdgirngwswq.supabase.co/rest/v1/
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxcmFodXdhY2NkZ2lybmd3c3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxMDI1NjgsImV4cCI6MjA5OTY3ODU2OH0.tOBdFYd7LnaD3E9NzQZsgyUThcdKmpF4SqPNB8xOnkg
